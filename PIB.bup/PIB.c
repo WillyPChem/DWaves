@@ -6,6 +6,19 @@
 
 double pi = 3.14159265359;
 
+// Function prototype for Runge-Kutta method for updated the wavefunction in time.
+// RK3 is going to take the current wavefunction (double complex *wfn) at time
+// t_i and update to its value at a future time t_f = t_i + dt 
+// Arguments to the function:
+//    arg1 - (int) dim - number of points in the wavefunction
+//    arg2 - (double) *xvec - vector of x-values that the wfn is evaluated at
+//    arg3 - (double complex) *wfn - vector that stores the wfn values at time t_i
+//           when the function is called, and when the function has been executed,
+//           this vector will hold the wfn values at time t_f = t_i + dt
+//    arg4 - (double) dx - differential step along x between subsequent points in *xvec
+//    arg5 - (double) dt - differential step along time between subsequent times (i.e. t_f - t_i)
+void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
+
 // Function prototype for Second Derivative
 // dfdt is going to take the wave function, take the second derivative 
 // at each point multiplied by the imaginary unit 
@@ -63,24 +76,66 @@ for (j=1; j<dim; j++) {
 
 
 }
+
+void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
+
+  int i;
+  double complex *wfn_dot, *wfn2, *wfn3, *wfn_np1, *k1, *k2, *k3;
+  // Temporary arrays for computing derivatives of wfns and approximate updates to wfns
+  wfn_dot = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn2 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn3 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn_np1 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k1 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k2 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k3 = (double complex *)malloc((dim+1)*sizeof(double complex));
+
+  // Must initialize all (real and imaginary parts of) these elements of the arrays to zero 
+  for (i=0; i<=dim; i++) {
+    wfn_dot[i] = 0. + 0.*I;
+    wfn2[i] = 0. + 0.*I;
+    wfn3[i] = 0. + 0.*I;
+    wfn_np1[i] = 0. + 0.*I;
+    k1[i] = 0. + 0.*I;
+    k2[i] = 0. + 0.*I;
+    k3[i] = 0. + 0.*I;
+
+  }
+
+  // Get dPsi(n)/dt at initial time!
+  FiniteDifference_2D(dim, wfn, wfn_dot, dx);
+  // Compute approximate wfn update with Euler step
+  for (i=0; i<=dim; i++) {
+    k1[i] = dt*wfn_dot[i];
+    wfn2[i] = wfn[i] + k1[i]/2.;
+  }
+  // Get dPsi(n+k1/2)/dt
+  FiniteDifference_2D(dim, wfn2, wfn_dot, dx);
+  // Compute approximate wfn update with Euler step
+  for (i=0; i<=dim; i++) {
+    k2[i] = dt*wfn_dot[i];
+    wfn3[i] = wfn[i] + k2[i]/2.;
+  }
+  // Get dPsi(n+k2/2)/dt
+  FiniteDifference_2D(dim, wfn3, wfn_dot, dx);
+  // Compute approximate update with Euler step
+  // Then update actual wfn
+  for (i=0; i<=dim; i++) {
+    k3[i] = dt*wfn_dot[i];
+    wfn_np1[i] = wfn[i] + k1[i]/6. + 2.*k2[i]/3. + k3[i]/6.;
+    wfn[i] = wfn_np1[i];
+  }
+  // wfn vector has now been updated!  
+  // Now free memory associated with temporary vectors
+  free(wfn_dot);
+  free(wfn2);
+  free(wfn3);
+  free(wfn_np1);
+  free(k1);
+  free(k2);
+  free(k3);
+
+}
+
+
 // END 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
