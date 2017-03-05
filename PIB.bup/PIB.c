@@ -102,22 +102,22 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 
   }
 
-  // Get dPsi(n)/dt at initial time!
-  FiniteDifference_2D(dim, wfn, wfn_dot, dx);
+  // Get dPsi(n)/dt at initial time!	
+  dfdt(dim, wfn, wfn_dot, dx);
   // Compute approximate wfn update with Euler step
   for (i=0; i<=dim; i++) {
     k1[i] = dt*wfn_dot[i];
     wfn2[i] = wfn[i] + k1[i]/2.;
   }
   // Get dPsi(n+k1/2)/dt
-  FiniteDifference_2D(dim, wfn2, wfn_dot, dx);
+  dfdt(dim, wfn2, wfn_dot, dx);
   // Compute approximate wfn update with Euler step
   for (i=0; i<=dim; i++) {
     k2[i] = dt*wfn_dot[i];
     wfn3[i] = wfn[i] + k2[i]/2.;
   }
   // Get dPsi(n+k2/2)/dt
-  FiniteDifference_2D(dim, wfn3, wfn_dot, dx);
+  dfdt(dim, wfn3, wfn_dot, dx);
   // Compute approximate update with Euler step
   // Then update actual wfn
   for (i=0; i<=dim; i++) {
