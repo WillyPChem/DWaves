@@ -61,12 +61,16 @@ int main () {
           printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
   }
 
-
-
-	dfdt( dim, wfn, dpsi, dx); 
+  //RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
+  for (int j=0; j<1000; j++) {
+  
+        RK3(dim, x, wfn, dx, 0.01);
+	//dfdt( dim, wfn, dpsi, dx); 
+        printf("\n#%i\n",j+1);
 	for (i=0; i<=dim; i++) { 
-	printf(" %f (%e, %e)\n",x[i],creal(dpsi[i]),cimag(dpsi[i]));
-}
+	  printf(" %f %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
+        }
+  }
 }
 void dfdt(int dim, double complex *psivec, double complex  *dpsi, double dx ) {
 // write code here 
