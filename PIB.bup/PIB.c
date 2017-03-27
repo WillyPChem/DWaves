@@ -6,6 +6,9 @@
 
 double pi = 3.14159265359;
 
+
+double Gaussian(double x, double sigma );
+
 // Function prototype for Runge-Kutta method for updated the wavefunction in time.
 // RK3 is going to take the current wavefunction (double complex *wfn) at time
 // t_i and update to its value at a future time t_f = t_i + dt 
@@ -30,32 +33,39 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx );
 
 int main () {
-
-	int dim = 10;
+       // evaluate wavefunction at this many points
+       int dim = 2000;
        double *x;
        double complex *wfn, *dpsi;
-       double L = 1.;
-
+       // Length of domain in atomic units
+       double L = 200.;
+       // full width at half max of gaussin is ~2.35*sigma
+       double sigma = 4.7;
 
 	double dx;
 	int i;
 
 	dx = L/dim;
 
-x = (double *)malloc(dim*sizeof(double));
-wfn = (double complex *)malloc(dim*sizeof(double complex));
-dpsi= (double complex *)malloc(dim*sizeof(double complex));
-  for (i=0; i <=dim; i++)  {
+        x = (double *)malloc(dim*sizeof(double));
+        wfn = (double complex *)malloc(dim*sizeof(double complex));
+        dpsi= (double complex *)malloc(dim*sizeof(double complex));
 
 
-   x[i] = i*dx;
-   wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
-   printf(" %f %f %f\n",x[i], creal(wfn[i]), cimag(wfn[i])); 
-}
+
+        for (i=0; i<2000; i++) {
+
+          x[i] = (i-1000)*dx;
+
+          wfn[i] = Gaussian(x[i], sigma) + 0.*I;
+          printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
+  }
+
+
 
 	dfdt( dim, wfn, dpsi, dx); 
 	for (i=0; i<=dim; i++) { 
-	printf(" %f (%f, %f) (%f, %f)\n",x[i],creal(dpsi[i]),cimag(wfn[i])*pi*pi/2.,cimag(dpsi[i]), -1*creal(wfn[i])*pi*pi/2.);
+	printf(" %f (%e, %e)\n",x[i],creal(dpsi[i]),cimag(dpsi[i]));
 }
 }
 void dfdt(int dim, double complex *psivec, double complex  *dpsi, double dx ) {
@@ -136,6 +146,19 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
   free(k3);
 
 }
+
+
+
+double Gaussian(double x, double sigma) {
+
+  double prefac = 1./(sigma*sqrt(2*pi));
+  double fun = exp(-x*x/(2*sigma*sigma));
+
+
+  return prefac*fun;
+
+}
+
 
 
 
