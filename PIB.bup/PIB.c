@@ -34,7 +34,7 @@ void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx );
 
 int main () {
        // evaluate wavefunction at this many points
-       int dim = 2000;
+       int dim = 1000;
        double *x;
        double complex *wfn, *dpsi;
        // Length of domain in atomic units
@@ -53,25 +53,30 @@ int main () {
 
 
 
-        for (i=0; i<2000; i++) {
+        for (i=0; i<dim; i++) {
 
-          x[i] = (i-1000)*dx;
+          x[i] = (i-dim/2)*dx;
 
           wfn[i] = Gaussian(x[i], sigma) + 0.*I;
           printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
   }
 
   //RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
-  for (int j=0; j<1000; j++) {
+  int pidx=1;
+  for (int j=0; j<10000; j++) {
   
-        RK3(dim, x, wfn, dx, 0.001);
+        RK3(dim, x, wfn, dx, 0.005);
 	//dfdt( dim, wfn, dpsi, dx); 
-        printf("\n\n#%i\n",j+1);
-	for (i=0; i<=dim; i++) { 
-	  printf(" %f %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
-        }
-  }
+        if (j%10==0) {
+          printf("\n\n#%i\n",pidx);
+	  for (i=0; i<dim; i++) { 
+	    printf(" %f %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
+          }
+        pidx++;
+        }   
 }
+}
+
 void dfdt(int dim, double complex *psivec, double complex  *dpsi, double dx ) {
 // write code here 
  int j;
