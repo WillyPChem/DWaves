@@ -38,9 +38,9 @@ int main () {
        double *x;
        double complex *wfn, *dpsi;
        // Length of domain in atomic units
-       double L = 80.;
+       double L = 200.;
        // full width at half max of gaussin is ~2.35*sigma
-       double sigma = 10;
+       double sigma = 5;
 
 	double dx;
 	int i;
@@ -62,7 +62,7 @@ int main () {
   }
 
   //RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
-  for (int j=0; j<100; j++) {
+  for (int j=0; j<1000; j++) {
   
         RK3(dim, x, wfn, dx, 0.001);
 	//dfdt( dim, wfn, dpsi, dx); 
