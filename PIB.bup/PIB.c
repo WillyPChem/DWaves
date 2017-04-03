@@ -36,7 +36,7 @@ int main () {
        // evaluate wavefunction at this many points
        int dim = 1000;
        double *x;
-       double complex *wfn, *dpsi;
+       double complex *wfn, *dpsi, *wfn_star, *P;
        // Length of domain in atomic units
        double L = 300.;
        // full width at half max of gaussin is ~2.35*sigma
@@ -50,7 +50,8 @@ int main () {
         x = (double *)malloc(dim*sizeof(double));
         wfn = (double complex *)malloc(dim*sizeof(double complex));
         dpsi= (double complex *)malloc(dim*sizeof(double complex));
-
+        P   = (double complex *)malloc(dim*sizeof(double complex));
+        wfn_star = (double complex *)malloc(dim*sizeof(double complex));
 
 
         for (i=0; i<dim; i++) {
@@ -66,11 +67,13 @@ int main () {
   for (int j=0; j<50000; j++) {
   
         RK3(dim, x, wfn, dx, 0.001);
-	//dfdt( dim, wfn, dpsi, dx); 
+	//dfdt( dim, wfn, dpsi, dx);  
         if (j%50==0) {
           printf("\n\n#%i\n",pidx);
 	  for (i=0; i<dim; i++) { 
-	    printf(" %f %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
+            wfn_star[i] = conj(wfn[i]); // complex conjugate of wfn[i]
+            P[i] = wfn_star[i]*wfn[i];
+	    printf(" %f %e %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]),creal(P[i]));
           }
         pidx++;
         }   
