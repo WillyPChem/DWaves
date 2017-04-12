@@ -31,6 +31,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 //            arg 3 - dpsi - array of d/dt wavefunction values
 //            arg 4  the difference between dx , increment along x axis 
 void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx );
+double Collapse(int dim, double *xvec, double *P);
 
 int main () {
        // evaluate wavefunction at this many points
@@ -172,6 +173,21 @@ double Gaussian(double x, double sigma) {
 }
 
 
+double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
+
+  // TO DO:
+  // (1) Find maximum value of P array
+  // (2) Determine the frequency associated with this maximum value...
+  // e.g. if max(P) -> 1e-3, maybe you want this to correspond to a frequency 
+  // of 1000, in which case, you scale every other P(x) value by 1000.
+  // (3) Construct a list of possible position values with each position repeated 
+  //     a number of times N which is equal to floor( P(x)*1e6)... this will be called the choice array
+  //     C[] and it will have M values.
+  // (4) Choose a random integer i between 0 and M where M is the length of your choice array (C[]).
+  //     The collapsed position will correspond to C[i]
+  // (5) recalculate your wavefunction so that it corresponds to a Gaussian function centered
+  //     at position C[i].
+}
 
 
 // END 
