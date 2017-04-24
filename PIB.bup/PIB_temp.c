@@ -7,7 +7,7 @@
 double pi = 3.14159265359;
 
 
-double Gaussian(double x, double sigma );
+double Gaussian(double x, double sigma, double x_center );
 
 // Function prototype for Runge-Kutta method for updated the wavefunction in time.
 // RK3 is going to take the current wavefunction (double complex *wfn) at time
@@ -66,7 +66,7 @@ int main () {
 
           x[i] = (i-dim/2)*dx;
 
-          wfn[i] = Gaussian(x[i], sigma) + 0.*I;
+          wfn[i] = Gaussian(x[i], sigma, 0.) + 0.*I;
        //   printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
   }
 
@@ -183,11 +183,11 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 
 
 
-double Gaussian(double x, double sigma) {
+double Gaussian(double x, double sigma, double x_center) {
 
   double prefac = 1./(sigma*sqrt(2*pi));
-   double fun = exp(-x*x/(2*sigma*sigma));
-
+   double fun = exp(-(-x-x_center)*(-x-x_center))/(2*sigma*sigma));
+	
 
   return prefac*fun;
 
@@ -195,7 +195,7 @@ double Gaussian(double x, double sigma) {
 
 
 double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
-
+  double narrow_sigma = 1.;
   // TO DO:
   // (1) Find maximum value of P array
 
@@ -270,6 +270,18 @@ double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
 	int range = Length2 - 1;
 	int rchoice = rand() % range;
 	double rand_xvec = C[rchoice];
+	
+	// Duplicate loop that constructured initial gaussian centered at x=0
+	// but now it is centered at rand_xvec
+	
+	
+	
+	for (i=0; i<dim; i++) {
+
+          wfn[i] = Gaussian(xvec[i], narrow_sigma, rand_xvec) + 0.*I;
+       //   printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
+  }
+	// Gaussian(xvec, sigma, rand_xvec);
 
   // (5) recalculate your wavefunction so that it corresponds to a Gaussian function centered
   //     at position C[i].
