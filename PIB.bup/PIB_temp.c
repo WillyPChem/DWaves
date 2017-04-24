@@ -72,7 +72,7 @@ int main () {
 
   //RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
   int pidx=1;
-  for (int j=0; j<1; j++) {
+  for (int j=0; j<50000; j++) {
   
         RK3(dim, x, wfn, dx, 0.001);
 	//dfdt( dim, wfn, dpsi, dx);  
@@ -81,21 +81,17 @@ int main () {
 	  for (i=0; i<dim; i++) { 
             wfn_star[i] = conj(wfn[i]); // complex conjugate of wfn[i]
             P[i] = creal(wfn_star[i]*wfn[i]);
-	   // printf(" %f %e %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]),creal(P[i]));
+	    printf(" %f %e %e %e\n",x[i],creal(wfn[i]),cimag(wfn[i]),creal(P[i]));
 
-//Steve G Edits
-
-            //Cr[i] = creal(wfn[i]);
-            //Ci[i] = cimag(wfn[i]);
-	    //printf(" %f %e %e %e\n",x[i],Cr[i],Ci[i]);
             //Collapse(dim, x, P, wfn);  
-//edits end
 
           }
-          Collapse(dim, x, P, wfn);
-        pidx++;
+          if (j==10000) {
+            Collapse(dim, x, P, wfn);
+          }
+          pidx++;
         }   
-}
+   }  
 
 //Collapse BS
 
@@ -186,7 +182,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 double Gaussian(double x, double sigma, double x_center) {
 
   double prefac = 1./(sigma*sqrt(2*pi));
-   double fun = exp(-(-x-x_center)*(-x-x_center))/(2*sigma*sigma));
+   double fun = exp(-(x-x_center)*(x-x_center)/(2*sigma*sigma));
 	
 
   return prefac*fun;
@@ -202,7 +198,7 @@ double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
 	int index;
 	int length = dim; 
 	double max = P[0];
-        printf("  max is %12.10e\n",max);
+        //printf("  max is %12.10e\n",max);
         int *F;
         F = (int *)malloc(dim*sizeof(int));
 	for(int i=1;i<length;i++){
@@ -218,21 +214,21 @@ double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
   
 	int max_freq = 1000;
 	int freq_scale = floor(max_freq/max); 
-        printf("  MAX IS %12.10e\n",max);
-        printf("  FREQ SCALE %i\n", freq_scale);
+        //printf("  MAX IS %12.10e\n",max);
+        //printf("  FREQ SCALE %i\n", freq_scale);
 
 
 	int Length2 = 0;
 	for (int i=0; i<length ; i++){
 	F[i] = floor(freq_scale*P[i]);
 	Length2 = Length2 + F[i];
-	printf(" freq %i \n", F[i]);
+	//printf(" freq %i \n", F[i]);
 	
 
 		
 	}
 
-        printf("  TOTAL LENGTH IS %i\n",Length2);
+        //printf("  TOTAL LENGTH IS %i\n",Length2);
 
         
 
@@ -263,8 +259,8 @@ double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
 		}
 	}
 
-	for (int d;d<Length2;d++)
-		printf("  CHOICE ARRAY %i\n",C[d]);
+	//for (int d;d<Length2;d++)
+		//printf("  CHOICE ARRAY %i\n",C[d]);
  // (4) Choose a random integer i between 0 and M where M is the length of your choice array (C[]).
   //     The collapsed position will correspond to C[i]
 	int range = Length2 - 1;
@@ -276,8 +272,8 @@ double Collapse(int dim, double *xvec, double *P, double complex *wfn) {
 	
 	
 	
-	for (i=0; i<dim; i++) {
-
+	for (int i=0; i<dim; i++) {
+	
           wfn[i] = Gaussian(xvec[i], narrow_sigma, rand_xvec) + 0.*I;
        //   printf("  %e  %e  %e\n",x[i],creal(wfn[i]),cimag(wfn[i]));
   }
